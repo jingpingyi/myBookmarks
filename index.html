@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>我的导航</title>
+</head>
+
+<body>
+
+    <header></header>
+    <main>
+        <div id="kbds"></div>
+    </main>
+    <footer></footer>
+</body>
+<script>
+    var keys = [
+        ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+        ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+        ['z', 'x', 'c', 'v', 'b', 'n', 'm']
+    ]
+    var hash = {
+        "q": "qq.com",
+        "w": "weibo.com",
+        "e": "ele.com",
+        "r": "renren.com",
+        "t": "taobao.com",
+        "u": "uc.com",
+        "a": "anazon.com",
+        "g": "google.com",
+        "m": "meituan.com"
+    }
+    var hashInStorage = JSON.parse(localStorage.getItem('zzz') || 'null')
+    if(hashInStorage){
+        hash = hashInStorage
+    }
+    var i=0
+    while(i<keys.length){
+        var row = document.createElement('div')
+        kbds.appendChild(row)
+        var j =0
+        while(j<keys[i].length){
+            var kbd = document.createElement('kbd')
+            row.appendChild(kbd)
+            kbd.textContent = keys[i][j]
+            //添加删除按钮
+            var buttonE = document.createElement('button')
+            kbd.appendChild(buttonE)
+            buttonE.textContent = '编辑'
+            buttonE.id = keys[i][j]
+            buttonE.onclick = function(somekbd){
+                var key = this.id
+                var nWeb = prompt('请输入按键对应的网址')
+                hash[key] = nWeb
+                localStorage.setItem('zzz',JSON.stringify(hash))
+            }
+            j++
+        }
+        i++
+    }
+    //敲击按键打开对应的网址
+    document.onkeypress = function(somekbd){
+        var key = somekbd.key
+        var website = hash[key]
+        if(website){
+            window.open('http://'+website,'_blank')
+        }
+    }
+</script>
+
+</html>
