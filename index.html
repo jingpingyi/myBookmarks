@@ -9,64 +9,109 @@
 </head>
 
 <body>
-
     <header></header>
     <main>
         <div id="kbds"></div>
     </main>
-    <footer></footer>
+    <footer>
+
+    </footer>
 </body>
 <script>
-    var keys = [
-        ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
-        ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-        ['z', 'x', 'c', 'v', 'b', 'n', 'm']
-    ]
-    var hash = {
-        "q": "qq.com",
-        "w": "weibo.com",
-        "e": "ele.com",
-        "r": "renren.com",
-        "t": "taobao.com",
-        "u": "uc.com",
-        "a": "anazon.com",
-        "g": "google.com",
-        "m": "meituan.com"
-    }
-    var hashInStorage = JSON.parse(localStorage.getItem('zzz') || 'null')
-    if(hashInStorage){
-        hash = hashInStorage
-    }
-    var i=0
-    while(i<keys.length){
-        var row = document.createElement('div')
-        kbds.appendChild(row)
-        var j =0
-        while(j<keys[i].length){
-            var kbd = document.createElement('kbd')
-            row.appendChild(kbd)
-            kbd.textContent = keys[i][j]
-            //添加删除按钮
-            var buttonE = document.createElement('button')
-            kbd.appendChild(buttonE)
-            buttonE.textContent = '编辑'
-            buttonE.id = keys[i][j]
-            buttonE.onclick = function(somekbd){
-                var key = this.id
-                var nWeb = prompt('请输入按键对应的网址')
-                hash[key] = nWeb
-                localStorage.setItem('zzz',JSON.stringify(hash))
+    //1.初始化数据
+    var HASH = init()
+    var keys = HASH['keys']
+    var hash = HASH['hash']
+    //2.生成键盘
+    generateKeyboard(keys,hash)
+    //3.监听用户动作
+    listenUsr(hash)
+
+    //下面是私有工具函數
+    function listenUsr() {
+        document.onkeypress = function (somekbd) {
+            var key = somekbd.key
+            var website = hash[key]
+            if (website) {
+                window.open(website, '_blank')
             }
-            j++
         }
-        i++
     }
-    //敲击按键打开对应的网址
-    document.onkeypress = function(somekbd){
-        var key = somekbd.key
-        var website = hash[key]
-        if(website){
-            window.open('http://'+website,'_blank')
+    function init() {
+        var keys = [
+            ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+            ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+            ['z', 'x', 'c', 'v', 'b', 'n', 'm']
+        ]
+        var hash = {
+            "q": "https://www.qq.com/",
+            "w": "https://weibo.com/",
+            "z": "https://www.zhihu.com/",
+            "e": "https://www.ele.me/",
+            "t": "https://www.taobao.com/",
+            "y": "https://www.youtube.com/",
+            "b": "https://www.bilibili.com/",
+            "d": "https://www.douyu.com/",
+            "a": "https://www.amazon.cn/",
+            "j": "https://www.jd.com/",
+            "v": "https://v2ex.com/",
+            "i": "https://www.iqiyi.com/",
+            "m": "https://www.mgtv.com/",
+        }
+        var hashInStorage = getFromLocalStorage('zzz')
+        if (hashInStorage) {
+            hash = hashInStorage
+        }
+        return {
+            'keys': keys,
+            'hash': hash
+        }
+    }
+    function getFromLocalStorage(name) {
+        return JSON.parse(localStorage.getItem(name) || 'null')
+    }
+    function tag(tagName, attributes) {
+        var element = document.createElement(tagName)
+        for (var key in attributes) {
+            element[key] = attributes[key]
+        }
+        return element
+    }
+    function generateKeyboard(keys, hash) {
+        for (var i = 0; i < keys.length; i++) {
+            var div = tag('div', { className: 'row' })
+            for (var j = 0; j < keys[i].length; j++) {
+                var kbd = tag('kbd', { className: "key" })
+                var span = tag('span', { textContent: keys[i][j] })
+                var img = tag('img')
+                var button = tag('button', { textContent: '编辑', id: keys[i][j] })
+                //显示icon
+                var website = hash[keys[i][j]]
+                setIconSrc(website)
+                //编辑按钮
+                button.onclick = function (e) {
+                    var key = this.id
+                    var website = prompt('请输入按键对应的网址')
+                    hash[key] = website
+                    localStorage.setItem('zzz', JSON.stringify(hash))
+                    var img = e.target.previousSibling
+                    setIconSrc(website)
+                }
+                kbds.appendChild(div)
+                div.appendChild(kbd)
+                kbd.appendChild(span)
+                kbd.appendChild(img)
+                kbd.appendChild(button)
+
+                function setIconSrc(website) {
+                    if (website) {
+                        img.src = website + 'favicon.ico'
+                    } else { img.src = "./placehold.png" }
+                    img.onerror = function (e) {
+                        e.target.src = "./placehold.png"
+                    }
+                }
+            }
         }
     }
 </script>
